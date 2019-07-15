@@ -1,35 +1,28 @@
 #include <bits/stdc++.h>
- 
+#define int long long
 using namespace std;
- 
-long long calculate(long long x){
-	long long ans = 0;
-	long long aux = x;
-	for(long long i = 0; i<=18; i++){
-		ans += aux%10;
-		aux/=10;
+	
+bool check(int n, int s){
+	int digit = 0;
+	int num = n;
+	while(n> 0){
+		digit += n%10;
+		n/=10;
 	}
-	return x-ans;
+	return (num - digit >= s);
 }
- 
-int main(){
-	ios_base::sync_with_stdio(false);
-	long long n, s;
+int32_t main(){
+	int n,s;
 	cin >> n >> s;
-	
-	long long l = 0;
-	long long r = n;
-	
-	long long ans = n+1;
-	while(l <= r){
-		long long m = (l+r)/2;
- 
-		if(calculate(m) >= s){
+	int l = 0, r = n;
+	int ans = n+1;
+	while(l <=r ){
+		int m = (l+r)>>1;
+		if(check(m,s)){
 			ans = m;
 			r = m-1;
 		}
 		else l = m+1;
 	}
-	
-	cout << n - ans +1 << endl;
+	cout << n-ans + 1 << endl;
 }

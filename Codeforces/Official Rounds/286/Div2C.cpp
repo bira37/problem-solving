@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
- 
+
 using namespace std;
- 
+
 int dp[30002][1200];
 int v[30002];
- 
+
 int main(){
 	int n,d;
 	cin >> n >> d;
@@ -23,22 +23,28 @@ int main(){
 	int ans = 0;
 	for(int i=d; i<=30000; i++){
 		for(int j=0; j<=1199; j++){
+			//if(i < 31 && j < 31) cout << "dp[" << i << "][" << j << "]= " << dp[i][j] << endl;
 			ans = max(ans, dp[i][j]);
 			int delta = 0;
 			if(j%2 == 0) delta = -j/2;
 			else delta = (j+1)/2;
 			int aux = i+(d+delta);
 			int aux2;
+			//if(i == 10 && j < 30) cout << i << " " << j << endl;
+			//if(i == 10 && j < 30) cout << "delta " << delta << endl;
 			if(delta > 0) aux2 = 2*(delta)-1;
 			else aux2 = abs(2*delta);
+			//if(i == 10 && j < 30) cout << "auxes " << aux << " " << aux2 << endl;
 			if(aux > i && aux <= 30000) dp[aux][aux2] = max(dp[aux][aux2], dp[i][j] + v[aux]);
 			aux = i+d+(delta-1);
 			if(delta-1 > 0) aux2 = 2*(delta-1)-1;
 			else aux2 = abs(2*(delta-1));
+			//if(i == 10 && j < 30) cout << "auxes " << aux << " " << aux2 << endl;
 			if(aux > i && aux <= 30000) dp[aux][aux2] = max(dp[aux][aux2], dp[i][j] + v[aux]);
 			aux = i+d+(delta+1);
 			if(delta+1 > 0) aux2 = 2*(delta+1)-1;
 			else aux2 = abs(2*(delta+1));
+			//if(i == 10 && j < 30) cout << "auxes " << aux << " " << aux2 << endl;
 			if(aux > i && aux <= 30000) dp[aux][aux2] = max(dp[aux][aux2], dp[i][j] + v[aux]);
 		}
 	}

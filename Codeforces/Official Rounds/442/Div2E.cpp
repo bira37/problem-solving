@@ -1,168 +1,246 @@
 #include <bits/stdc++.h>
-#define ROOT 1
+
+#define int long long
+#define double long double
+#define ff first
+#define ss second
 #define endl '\n'
- 
+#define ii pair<int, int>
+#define mp make_tuple
+#define mt make_tuple
+#define DESYNC ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
+#define pb push_back
+#define vi vector<int>
+#define vii vector< ii >
+#define EPS 1e-9
+#define INF 1e18
+#define ROOT 1
+#define M 1000000007
+const double PI = acos(-1);
+
 using namespace std;
- 
-struct node{
-	int lazy = 0;
-	int val = 0;
-	node() {}
+
+inline int mod(int n, int m){ int ret = n%m; if(ret < 0) ret += m; return ret; }
+
+int gcd(int a, int b){
+  if(a == 0 || b == 0) return 0;
+  else return abs(__gcd(a,b));
+}
+
+vector<int> adj[212345];
+int v[212345];
+
+struct HLD {
+
+  struct node{
+    //node values
+    int val = 0; //sets neutral value for the operation
+    int lazy = 0;
+    node() {}
+    node(int val) : val(val){
+      lazy = 0;
+    }
+    
+    node merge(node b){
+      node ret;
+      ret = val + b.val;
+      return ret;
+    }
+  };
+  
+
+  struct SegmentTree{
+  
+    vector<node> st;
+    
+    SegmentTree() {}
+    
+    void construct(int n){
+      st.resize(4*n);
+    }
+    
+    void propagate(int cur, int l, int r){
+      if(st[cur].lazy == 0) return;
+      
+      st[cur].val = (r-l+1) - st[cur].val;
+      
+      if(l != r){
+        st[2*cur].lazy ^= 1;
+        st[2*cur+1].lazy ^= 1;
+      }
+      
+      st[cur].lazy = 0;
+    }
+    
+    void build(int cur, int l, int r){
+      if(l == r){
+        st[cur] = node(v[l]);
+        return;
+      }
+      
+      int m = (l+r)>>1;
+      
+      build(2*cur, l, m);
+      build(2*cur+1, m+1, r);
+      st[cur] = st[2*cur].merge(st[2*cur+1]);
+    }
+      
+    
+    void update(int cur, int l, int r, int a, int b, int val){
+      propagate(cur, l, r);
+      if(b < l || r < a) return;
+      if(a <= l && r <= b){
+        st[cur].lazy ^= val;
+        propagate(cur, l, r);
+        return;
+      }
+      int m = (l+r)>>1;
+      update(2*cur, l, m, a, b, val);
+      update(2*cur+1, m+1, r, a, b, val);
+      st[cur] = st[2*cur].merge(st[2*cur+1]);
+    }
+    
+    node query(int cur, int l, int r, int a, int b){
+      propagate(cur, l, r);
+      if(b < l || r < a) return node();  
+      if(a <= l && r <= b) return st[cur];
+      int m = (l+r)>>1;
+      node lef = query(2*cur, l, m, a, b);
+      node rig = query(2*cur+1, m+1, r, a, b);
+      return lef.merge(rig);
+    }
+    
+  } st;
+      
+
+  vector<int> L, P, ch, subsz, in, out;
+  int t;
+  
+  HLD () {}
+  
+  HLD(int n){
+    L.resize(n+1);
+    P.resize(n+1);
+    ch.resize(n+1);
+    subsz.resize(n+1);
+    in.resize(n+1);
+    out.resize(n+1);
+    st.construct(n+1);
+    t = 0;
+    for(int i=0; i<=n; i++){
+      ch[i] = i;
+      P[i] = -1;
+      L[i] = 0;
+    }
+  }
+
+  void precalculate(int u, int p = -1){
+    subsz[u] = 1;
+    for(int &v : adj[u]){
+      if(v == p) continue;
+      P[v] = u;
+      L[v] = L[u]+1;
+      precalculate(v, u);
+      if(subsz[adj[u][0]] < subsz[v]) swap(adj[u][0], v);
+      subsz[u] += subsz[v];
+    }
+  }
+
+  void build(int u, int p = -1){
+    in[u] = ++t;
+    for(int v : adj[u]){
+      if(v == p) continue;
+      if(adj[u][0] == v){
+        ch[v] = ch[u];
+      }
+      build(v, u);
+    }
+    out[u] = t;
+  }
+  
+  void calculate(int root = 1){
+    precalculate(root);
+    build(root);
+  }
+  
+  void build_ds(){
+    st.build(1, 1, t);
+  }
+
+  void path_update(int a, int b, int val, bool edge_update = false){
+    while(ch[a] != ch[b]){
+      if(L[ch[b]] > L[ch[a]]) swap(a,b);
+      if(in[ch[a]] + edge_update <= in[a]) st.update(1, 1, t, in[ch[a]] + edge_update, in[a], val);
+      a = P[ch[a]];
+    }
+    if(L[b] < L[a]) swap(a,b);
+    if(in[a]+edge_update <= in[b]) st.update(1, 1, t, in[a]+edge_update, in[b], val);
+  }
+  
+  void node_update(int u, int val){
+    st.update(1, 1, t, in[u], in[u], val);
+  }
+  
+  void edge_update(int u, int v, int val){
+    if(L[u] > L[v]) swap(u, v);
+    st.update(1, 1, t, in[v], in[v], val);
+  }
+  
+  void subtree_update(int u, int val, bool edge_update = false){
+    if(in[u] + edge_update <= out[u]) st.update(1, 1, t, in[u] + edge_update, out[u], val);
+  }      
+
+  node path_query(int a, int b, bool edge_query = false){
+    node ans;
+    while(ch[a] != ch[b]){
+      if(L[ch[b]] > L[ch[a]]) swap(a,b);
+      if(in[ch[a]] + edge_query <= in[a]) ans.merge(st.query(1, 1, t, in[ch[a]] + edge_query, in[a]));
+      a = P[ch[a]];
+    }
+    if(L[b] < L[a]) swap(a,b);
+    if(in[a]+edge_query <= in[b]) ans.merge(st.query(1, 1, t, in[a]+edge_query, in[b]));
+    return ans;
+  }
+  
+  node node_query(int u){
+    return st.query(1, 1, t, in[u], in[u]);
+  }
+  
+  node edge_query(int u, int v){
+    if(L[u] > L[v]) swap(u,v);
+    return st.query(1, 1, t, in[v], in[v]);
+  }
+  
+  node subtree_query(int u, bool edge_query = false){
+    if(in[u] + edge_query <= out[u]) return st.query(1, 1, t, in[u] + edge_query, out[u]);
+    else return node();
+  } 
+  
 };
- 
-int L[2*112345], vis[2*112345], P[2*112345], ch[2*112345], subsz[2*112345], st[2*112345], ed[2*112345], heavy[2*112345], vet[2*112345];
-int t = 0;
-vector<int> adj[2*112345];
-node tree[2*4*2*112345];
-int n,q;
- 
-void init(){
-	t = 0;
-	for(int i=0; i<=n; i++){
-		vis[i] = false;
-		adj[i].clear();
-		ch[i] = i;
-		L[i] = 0;
-		P[i] = -1;
-		subsz[i] = 1;
-		heavy[i] = -1;
-	}
+
+int32_t main(){
+  DESYNC;
+  int n;
+  cin >> n;
+  for(int i=2; i<=n; i++){
+    int v;
+    cin >> v;
+    adj[v].pb(i);
+  }
+  HLD hld(n);
+  hld.calculate();
+  for(int i=1; i<=n; i++){
+    cin >> v[hld.in[i]];
+  }
+  hld.build_ds();
+  int q;
+  cin >> q;
+  while(q--){
+    string op;
+    int u;
+    cin >> op >> u;
+    if(op == "get") cout << hld.subtree_query(u).val << endl;
+    else hld.subtree_update(u, 1);
+  }  
 }
- 
-node combine(node a, node b){
-	node res;
-	res.val = a.val+b.val;
-	return res;
-}
- 
-void build(int root, int l, int r){
-	tree[root].lazy = 0;
-	if(l == r){
-		tree[root].val = vet[l];
-		return;
-	}
-	int m = (l+r)/2;
-	build(2*root, l,m);
-	build(2*root+1, m+1, r);
-	tree[root] = combine(tree[2*root], tree[2*root+1]);
-}
- 
-void propagate(int root, int l , int r){
-	if(tree[root].lazy == 0) return;
-	
-	if(tree[root].lazy%2) tree[root].val = (r-l+1)-tree[root].val;
-	
-	if(l != r){
-		tree[2*root].lazy += tree[root].lazy;
-		tree[2*root+1].lazy += tree[root].lazy;
-	}
-	
-	tree[root].lazy = 0;
-}
- 
-void seg_update(int root, int l, int r, int a, int b, int type){
-	propagate(root, l , r);
-	if(l == a && r == b){
-		tree[root].lazy += type;
-		return;
-	}
-	
-	int m = (l+r)/2;
-	
-	if(b <= m) seg_update(2*root, l, m, a, b, type);
-	else if(m < a) seg_update(2*root+1, m+1, r, a, b, type);
-	else {
-		seg_update(2*root, l, m, a, m, type);
-		seg_update(2*root+1, m+1, r, m+1, b, type);
-	}
-	
-	propagate(root, l , r);
-	propagate(2*root, l, m);
-	propagate(2*root+1, m+1, r);
-	tree[root] = combine(tree[2*root], tree[2*root+1]);
-}
- 
-node seg_query(int root, int l, int r, int a, int b){
-	propagate(root, l, r);
-	if(l == a && r == b) return tree[root];
-	
-	int m = (l+r)/2;
-	if(b <= m) return seg_query(2*root, l, m, a, b);
-	else if(m < a) return seg_query(2*root+1, m+1, r, a, b);
-	else {
-		node left = seg_query(2*root, l, m, a, m);
-		node right = seg_query(2*root+1, m+1, r, m+1, b);
-		node ans = combine(left, right);
-		return ans;
-	}
-}
- 
-void pre_dfs(int u){
-	vis[u] = true;
-	for(int i=0; i<adj[u].size(); i++){
-		int v = adj[u][i];
-		if(vis[v]) continue;
-		P[v] = u;
-		L[v]=L[u]+1;
-		pre_dfs(v);
-		if(heavy[u] == -1 || subsz[heavy[u]] < subsz[v]) heavy[u] = v;
-		subsz[u]+=subsz[v];
-	}
-}
- 
-void st_dfs(int u){
-	vis[u] = true;
-	st[u]=t++;
-	if(heavy[u] != -1){
-		ch[heavy[u]] = ch[u];
-		st_dfs(heavy[u]);
-	}
-	for(int i=0; i<adj[u].size(); i++){
-		int v = adj[u][i];
-		if(vis[v] || v == heavy[u]) continue;
-		st_dfs(v);
-	}
-	ed[u] = t++;
-}
- 
-void atualiza(int u){
-	seg_update(ROOT, 0, t-1, st[u], ed[u], 1);
-}		
- 
-int main(){
-	ios_base::sync_with_stdio(false);
-	cin >> n;
-	init();
-	for(int i=2; i<=n; i++){
-		int v;
-		cin >> v;
-		adj[i].push_back(v);
-		adj[v].push_back(i);
-	}
-	pre_dfs(1);
-	for(int i=0; i<=n; i++) vis[i] = false;
-	st_dfs(1);
-	for(int i=1; i<=n; i++){
-		cin >> vet[st[i]];
-		vet[ed[i]] = vet[st[i]];
-	}
-	build(ROOT, 0, t-1);
-	cin >> q;
-	//for(int i=1; i<=n; i++){
-	//	cout << seg_query(ROOT, 0, t-1, st[i]).val << " ";
-	//}
-	//cout << endl;
-	while(q--){
-		string x;
-		int k;
-		cin >> x >> k;
-		if(x == "pow") atualiza(k);
-		else {
-			cout << seg_query(ROOT, 0, t-1, st[k], ed[k]).val/2 << endl; 
-		}
-		//for(int i=1; i<=n; i++){
-		//	cout << seg_query(ROOT, 0, t-1, st[i]).val << " ";
-		//}
-		//cout << endl;
-	}
-}
+
