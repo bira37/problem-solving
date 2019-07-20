@@ -7,6 +7,6 @@ I hope it helps someone on their competitive programming training.
 
 -----------------------------------------------------------------------------------------------------------------------------------
 
-Este repositório contém soluções para problemas de programação competitiva resolvidos por mim de todos os meus anos de estudo e treinamento. A maioria delas são de problemas do Codeforces. Porém, também é possível encontrar soluções para problemas do SPOJ, Codechef, AtCoder e alguns outros sites. Os problemas estão organizados por site e por competição, para facilitar a busca. 
+Este repositório contém soluções para problemas de programação competitiva resolvidos por mim em todos os meus anos de estudo e treinamento. A maioria delas são de problemas do Codeforces. Porém, também é possível encontrar soluções para problemas do SPOJ, Codechef, AtCoder e alguns outros sites. Os problemas estão organizados por site e por competição, para facilitar a busca. 
 
 Espero que este repositório ajude aqueles que estão treinando para competições de programação. 
