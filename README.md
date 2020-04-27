@@ -1,12 +1,9 @@
-### Competitive Programming Problems' Solution Library
-### Biblioteca de Soluções para Problemas de Programação Competitiva
+## Programming Problem's Solutions
 
-This repository contains solutions for competitive programming problems from all my years of study and practice. Most of them are from Codeforces (the site i used the most). However, you can also find solutions for some problems from other sites like SPOJ, Codechef and AtCoder. The problems are organized by site and contest, in order to facilitate the search. 
+This repository aims to provide the solution for a large quantity of problems from programming websites, competitions and interview questions. The majority of solutions found here were from my years of study and practice, but also contains solutions from other contributors. All the solutions are organized within its website folder in a way that facilitate the search. 
 
-Feel free to contribute to this repository by sending your solutions to other problems or to the same problems in other programming languages. I hope it helps someone on their competitive programming training. 
+Feel free to contribute to this repository by sending your solutions to other problems or to the same problems in other programming languages.
 
------------------------------------------------------------------------------------------------------------------------------------
+### Contributors
 
-Este repositório contém soluções para problemas de programação competitiva resolvidos por mim em todos os meus anos de estudo e treinamento. A maioria delas são de problemas do Codeforces. Porém, também é possível encontrar soluções para problemas encontrados em outros sites como SPOJ, Codechef e AtCoder. Os problemas estão organizados por site e por competição, para facilitar a busca. 
-
-Sinta-se à vontade para contribuir com este repositório enviando suas soluções para outros problemas ou para os mesmos problemas em outras linguagens de programação. Espero que este repositório ajude aqueles que estão treinando para competições de programação. 
+Thanks to [NaimSS](https://github.com/NaimSS) for providing the solution for some OBI and CSES problems, as well as almost all problems from AtCoder's Educational DP Contest
