@@ -1,0 +1,82 @@
+#include <bits/stdc++.h>
+
+#define int long long
+#define double long double
+#define ff first
+#define ss second
+#define endl '\n'
+#define ii pair<int, int>
+#define mp make_pair
+#define mt make_tuple
+#define DESYNC                      \
+  ios_base::sync_with_stdio(false); \
+  fin.tie(0);                       \
+  cout.tie(0)
+#define pb push_back
+#define vi vector<int>
+#define vii vector<ii>
+#define all(x) x.begin(), x.end()
+#define EPS 1e-9
+#define INF 1e18
+#define ROOT 1
+#define M 1000000007
+#define curtime chrono::steady_clock::now().time_since_epoch().count
+#define rep(i, beg, n, s) for (int i = beg; i < n; i += s)
+const double PI = acos(-1);
+
+using namespace std;
+
+inline int mod(int n, int m = M) {
+  int ret = n % m;
+  if (ret < 0) ret += m;
+  return ret;
+}
+
+int exp(int n, int k) {
+  if (k == 0) return 1;
+  if (k == 1) return n;
+  int ax = exp(n, k / 2);
+  ax = mod(ax * ax);
+  if (k % 2) ax = mod(ax * n);
+  return ax;
+}
+
+int gcd(int a, int b) {
+  if (a == 0)
+    return b;
+  else
+    return gcd(b % a, a);
+}
+
+int c[25][25];
+
+int binomial(int n, int k) {
+  memset(c, 0, sizeof c);
+  for (int i = 0; i <= n; i++) {
+    for (int j = 0; j <= min(i, k); j++) {
+      if (j == 0 || j == i)
+        c[i][j] = 1;
+      else
+        c[i][j] = c[i - 1][j] + c[i - 1][j - 1];
+    }
+  }
+  return c[n][k];
+}
+ifstream fin("popcorn.in");
+
+#define MULTIPLE_TEST_CASE
+void solution() {
+  int n, k;
+  fin >> n >> k;
+  cout << binomial(n, k) << endl;
+}
+
+int32_t main() {
+  DESYNC;
+  mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+  int t = 1;
+#ifdef MULTIPLE_TEST_CASE
+  fin >> t;
+#endif
+  while (t--) solution();
+}
