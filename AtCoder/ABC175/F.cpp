@@ -88,7 +88,7 @@ tuple<string, string> calc(string a, string b)
   return mt(s, t);
 }
 
-bool palin(string s)
+bool palin(string &s)
 {
   string t = s;
   reverse(all(t));
@@ -111,22 +111,24 @@ void solution()
   set<pair<int, pss>> pq;
   for (int i = 0; i < n; i++)
   {
-    dist[mp(s[i], "")] = c[i];
-    dist[mp("", s[i])] = c[i];
+    if (!dist.count(mp(s[i], "")))
+      dist[mp(s[i], "")] = INF;
+    if (!dist.count(mp("", s[i])))
+      dist[mp("", s[i])] = INF;
+    dist[mp(s[i], "")] = min(dist[mp(s[i], "")], c[i]);
+    dist[mp("", s[i])] = min(dist[mp("", s[i])], c[i]);
     pq.insert(mp(c[i], mp("", s[i])));
     pq.insert(mp(c[i], mp(s[i], "")));
   }
 
-  int ans = INF;
   while (!pq.empty())
   {
     int cur = pq.begin()->ff;
     string pre = pq.begin()->ss.ff;
     string suf = pq.begin()->ss.ss;
     pq.erase(pq.begin());
-
-    if (palin(pre + suf))
-      ans = min(ans, cur);
+    if (dist[mp(pre, suf)] != cur)
+      continue;
 
     //cout << "dist " << pre << " | " << suf << " = " << cur << endl;
     if (pre == "")
@@ -167,14 +169,18 @@ void solution()
     }
   }
 
+  int ans = INF;
   for (auto state : dist)
   {
     string a = state.ff.ff;
     string b = state.ff.ss;
-    if (palin(a + b))
+    bool ok = false;
+    ok |= (a.size() == 0 && b.size() == 0);
+    ok |= (a.size() == 0 && palin(b));
+    ok |= (b.size() == 0 && palin(a));
+    if (ok)
       ans = min(ans, state.ss);
   }
-
   cout << (ans < INF ? ans : -1) << endl;
 }
 
@@ -189,4 +195,3 @@ int32_t main()
   while (t--)
     solution();
 }
-
